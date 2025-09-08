@@ -1,0 +1,35 @@
+ls
+cd test_dir
+ls
+cd ..
+cd ~
+
+ls
+cd level1
+ls
+cd level2
+ls
+cd level3
+ls
+
+cd ..
+cd ..
+cd ..
+
+cd docs
+ls
+cd help
+ls
+
+cd ~
+ls
+
+vfs-save complete_test_save.json
+
+cd nonexistent_dir
+ls nonexistent_path
+
+cd "level1"
+ls "level2"
+
+exit

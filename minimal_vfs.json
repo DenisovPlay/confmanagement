@@ -1,0 +1,9 @@
+{
+  "type": "directory",
+  "children": {
+    "file1.txt": {
+      "type": "file",
+      "content": "SGVsbG8gV29ybGQh"
+    }
+  }
+}

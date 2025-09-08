@@ -1,0 +1,25 @@
+{
+  "type": "directory",
+  "children": {
+    "file1.txt": {
+      "type": "file",
+      "content": "SGVsbG8gV29ybGQh"
+    },
+    "file2.txt": {
+      "type": "file",
+      "content": "VGhpcyBpcyBhIHRlc3QgZmlsZQ=="
+    },
+    "data.bin": {
+      "type": "file",
+      "content": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+    },
+    "readme.md": {
+      "type": "file",
+      "content": "IyBSZWFkbWUKClRoaXMgaXMgYSB0ZXN0IHJlYWRtZSBmaWxl"
+    },
+    "config.json": {
+      "type": "file",
+      "content": "eyJuYW1lIjoidGVzdCIsInZlcnNpb24iOiIxLjAifQ=="
+    }
+  }
+}

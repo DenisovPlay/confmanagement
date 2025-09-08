@@ -4,11 +4,124 @@ import shlex
 import sys
 import argparse
 import os
+import json
+import base64
+from pathlib import Path
 
 username = getpass.getuser()
 hostname = socket.gethostname()
 current_dir = "~"
 vfs_path = None
+vfs_data = None
+
+def load_vfs(vfs_file_path):
+    global vfs_data
+    try:
+        with open(vfs_file_path, 'r', encoding='utf-8') as f:
+            vfs_data = json.load(f)
+        return True
+    except FileNotFoundError:
+        print(f"Ошибка: VFS файл не найден: {vfs_file_path}")
+        return False
+    except json.JSONDecodeError as e:
+        print(f"Ошибка: неверный формат JSON в VFS файле: {e}")
+        return False
+    except Exception as e:
+        print(f"Ошибка загрузки VFS: {e}")
+        return False
+
+def get_vfs_path(path):
+    if path.startswith('~'):
+        path = path[1:]
+    if path.startswith('/'):
+        path = path[1:]
+    return path.split('/') if path else []
+
+def find_vfs_item(path_parts):
+    if not vfs_data:
+        return None
+    
+    current = vfs_data
+    for part in path_parts:
+        if part == '':
+            continue
+        if 'children' in current and part in current['children']:
+            current = current['children'][part]
+        else:
+            return None
+    return current
+
+def list_vfs_directory(path):
+    path_parts = get_vfs_path(path) if path != "~" else []
+    item = find_vfs_item(path_parts)
+    
+    if not item:
+        return f"ls: {path}: нет такого файла или каталога"
+    
+    if item.get('type') != 'directory':
+        return f"ls: {path}: не является каталогом"
+    
+    if 'children' not in item:
+        return ""
+    
+    result = []
+    for name, child in item['children'].items():
+        if child.get('type') == 'directory':
+            result.append(f"d {name}/")
+        else:
+            size = len(base64.b64decode(child.get('content', ''))) if child.get('content') else 0
+            result.append(f"- {name} ({size} bytes)")
+    
+    return '\n'.join(result)
+
+def change_vfs_directory(path):
+    global current_dir
+    
+    if path == "~" or path == "":
+        current_dir = "~"
+        return True
+    
+    if path == "..":
+        if current_dir == "~":
+            return True
+        parts = current_dir.split("/")
+        if len(parts) > 1:
+            current_dir = "/".join(parts[:-1])
+        else:
+            current_dir = "~"
+        return True
+    
+    new_path = path
+    if current_dir != "~":
+        new_path = f"{current_dir}/{path}"
+    
+    path_parts = get_vfs_path(new_path)
+    item = find_vfs_item(path_parts)
+    
+    if not item:
+        print(f"cd: {path}: нет такого файла или каталога")
+        return False
+    
+    if item.get('type') != 'directory':
+        print(f"cd: {path}: не является каталогом")
+        return False
+    
+    current_dir = new_path if new_path != "" else "~"
+    return True
+
+def save_vfs(save_path):
+    if not vfs_data:
+        print("Ошибка: VFS не загружена")
+        return False
+    
+    try:
+        with open(save_path, 'w', encoding='utf-8') as f:
+            json.dump(vfs_data, f, ensure_ascii=False, indent=2)
+        print(f"VFS сохранена в {save_path}")
+        return True
+    except Exception as e:
+        print(f"Ошибка сохранения VFS: {e}")
+        return False
 
 def get_prompt():
     return f"{username}@{hostname}:{current_dir}$ "
@@ -20,26 +133,41 @@ def parse_command(input_line):
         raise ValueError(f"Ошибка парсинга: {e}")
 
 def cmd_ls(args):
-    print(f"ls {' '.join(args) if args else ''}")
+    if vfs_data:
+        path = args[0] if args else current_dir
+        result = list_vfs_directory(path)
+        print(result)
+    else:
+        print(f"ls {' '.join(args) if args else ''}")
 
 def cmd_cd(args):
     global current_dir
-    print(f"cd {' '.join(args) if args else ''}")
-    if args:
-        if args[0] == "~" or args[0] == "":
-            current_dir = "~"
-        elif args[0] == "..":
-            if current_dir != "~":
-                parts = current_dir.split("/")
-                if len(parts) > 1:
-                    current_dir = "/".join(parts[:-1])
-                else:
-                    current_dir = "~"
-        else:
-            if current_dir == "~":
-                current_dir = args[0]
+    if vfs_data:
+        path = args[0] if args else "~"
+        change_vfs_directory(path)
+    else:
+        print(f"cd {' '.join(args) if args else ''}")
+        if args:
+            if args[0] == "~" or args[0] == "":
+                current_dir = "~"
+            elif args[0] == "..":
+                if current_dir != "~":
+                    parts = current_dir.split("/")
+                    if len(parts) > 1:
+                        current_dir = "/".join(parts[:-1])
+                    else:
+                        current_dir = "~"
             else:
-                current_dir = f"{current_dir}/{args[0]}"
+                if current_dir == "~":
+                    current_dir = args[0]
+                else:
+                    current_dir = f"{current_dir}/{args[0]}"
+
+def cmd_vfs_save(args):
+    if not args:
+        print("vfs-save: необходимо указать путь для сохранения")
+        return
+    save_vfs(args[0])
 
 def cmd_exit(args):
     print("exit")
@@ -99,6 +227,7 @@ def execute_command(args):
     commands = {
         'ls': cmd_ls,
         'cd': cmd_cd,
+        'vfs-save': cmd_vfs_save,
         'exit': cmd_exit
     }
     if command in commands:
@@ -115,6 +244,13 @@ def main():
     vfs_path = args.vfs
     
     print_config(args)
+    
+    if args.vfs:
+        print(f"\nЗагрузка VFS: {args.vfs}")
+        if load_vfs(args.vfs):
+            print("VFS успешно загружена")
+        else:
+            print("Ошибка загрузки VFS, работа в режиме без VFS")
     
     if args.script:
         print(f"\nВыполнение стартового скрипта: {args.script}")
