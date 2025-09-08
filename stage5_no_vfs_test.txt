@@ -1,0 +1,5 @@
+echo "Тестирование без VFS:"
+touch test_file.txt
+chmod 755 test_file.txt
+echo "Команды должны сообщить об отсутствии VFS"
+exit

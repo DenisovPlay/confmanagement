@@ -1,0 +1,30 @@
+echo "=== Демонстрация создания и модификации файлов ==="
+ls
+echo "Создаем новые файлы:"
+touch config.txt
+touch data.csv
+touch script.py
+ls
+echo "Устанавливаем права доступа:"
+chmod 644 config.txt
+chmod 755 script.py
+chmod 600 data.csv
+echo "Переходим в подкаталог и создаем файлы там:"
+cd level1
+touch project.txt
+chmod 755 project.txt
+ls
+cd level2
+touch notes.md
+chmod 644 notes.md
+ls
+cd level3
+touch backup.tar
+chmod 600 backup.tar
+ls
+cd ~
+echo "Финальное состояние корневого каталога:"
+ls
+vfs-save demo_stage5.json
+echo "Демонстрация завершена"
+exit

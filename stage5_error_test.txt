@@ -1,0 +1,11 @@
+echo "Тест ошибок для touch и chmod:"
+touch
+chmod
+chmod 755
+chmod abc file.txt
+chmod 12345 file.txt
+touch file1.txt
+touch file1.txt
+chmod 755 file1.txt
+chmod 644 nonexistent.txt
+exit

@@ -1,0 +1,112 @@
+{
+  "type": "directory",
+  "children": {
+    "root_file.txt": {
+      "type": "file",
+      "content": "Um9vdCBsZXZlbCBmaWxl"
+    },
+    "level1": {
+      "type": "directory",
+      "children": {
+        "level1_file.txt": {
+          "type": "file",
+          "content": "TGV2ZWwgMSBmaWxl"
+        },
+        "level2": {
+          "type": "directory",
+          "children": {
+            "level2_file.txt": {
+              "type": "file",
+              "content": "TGV2ZWwgMiBmaWxl"
+            },
+            "level3": {
+              "type": "directory",
+              "children": {
+                "deep_file.txt": {
+                  "type": "file",
+                  "content": "RGVlcCBmaWxlIGF0IGxldmVsIDM="
+                },
+                "binary_data.bin": {
+                  "type": "file",
+                  "content": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA="
+                }
+              }
+            },
+            "another_level3": {
+              "type": "directory",
+              "children": {
+                "config.ini": {
+                  "type": "file",
+                  "content": "W3NlY3Rpb25dCmtleT12YWx1ZQ=="
+                }
+              }
+            },
+            "level2_new_file.txt": {
+              "type": "file",
+              "content": "",
+              "permissions": "755"
+            }
+          }
+        },
+        "sibling_dir": {
+          "type": "directory",
+          "children": {
+            "sibling_file.txt": {
+              "type": "file",
+              "content": "U2libGluZyBmaWxl"
+            }
+          }
+        },
+        "level1_new_file.txt": {
+          "type": "file",
+          "content": "",
+          "permissions": "600"
+        }
+      }
+    },
+    "docs": {
+      "type": "directory",
+      "children": {
+        "manual.txt": {
+          "type": "file",
+          "content": "VXNlciBtYW51YWw="
+        },
+        "help": {
+          "type": "directory",
+          "children": {
+            "faq.txt": {
+              "type": "file",
+              "content": "RnJlcXVlbnRseSBhc2tlZCBxdWVzdGlvbnM="
+            }
+          },
+          "permissions": "755"
+        },
+        "readme.txt": {
+          "type": "file",
+          "content": "",
+          "permissions": "644"
+        }
+      }
+    },
+    "new_file.txt": {
+      "type": "file",
+      "content": "",
+      "permissions": "755"
+    },
+    "test_document.md": {
+      "type": "file",
+      "content": "",
+      "permissions": "644"
+    },
+    "script.sh": {
+      "type": "file",
+      "content": "",
+      "permissions": "777"
+    },
+    "should_fail.txt": {
+      "type": "file",
+      "content": "",
+      "permissions": "644"
+    }
+  }
+}

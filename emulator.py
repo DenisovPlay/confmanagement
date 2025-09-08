@@ -222,6 +222,74 @@ def cmd_wc(args):
     
     print(f"  {lines}  {words} {chars} {args[0]}")
 
+def cmd_touch(args):
+    if not args:
+        print("touch: отсутствует аргумент файла")
+        return
+    
+    if not vfs_data:
+        print("touch: VFS не загружена")
+        return
+    
+    file_name = args[0]
+    
+    current_path_parts = get_vfs_path(current_dir) if current_dir != "~" else []
+    current_item = find_vfs_item(current_path_parts)
+    
+    if not current_item or current_item.get('type') != 'directory':
+        print(f"touch: текущая директория недоступна")
+        return
+    
+    if 'children' not in current_item:
+        current_item['children'] = {}
+    
+    if file_name in current_item['children']:
+        print(f"touch: файл '{file_name}' уже существует")
+        return
+    
+    current_item['children'][file_name] = {
+        'type': 'file',
+        'content': '',
+        'permissions': '644'
+    }
+    
+    print(f"touch: файл '{file_name}' создан")
+
+def cmd_chmod(args):
+    if len(args) < 2:
+        print("chmod: неверное количество аргументов")
+        print("Использование: chmod <права> <файл>")
+        return
+    
+    if not vfs_data:
+        print("chmod: VFS не загружена")
+        return
+    
+    permissions = args[0]
+    file_name = args[1]
+    
+    if not permissions.isdigit() or len(permissions) != 3:
+        print("chmod: неверный формат прав (используйте трёхзначное число)")
+        return
+    
+    file_path = file_name
+    if current_dir != "~":
+        file_path = f"{current_dir}/{file_name}"
+    
+    path_parts = get_vfs_path(file_path)
+    item = find_vfs_item(path_parts)
+    
+    if not item:
+        print(f"chmod: {file_name}: нет такого файла или каталога")
+        return
+    
+    if item.get('type') not in ['file', 'directory']:
+        print(f"chmod: {file_name}: неподдерживаемый тип объекта")
+        return
+    
+    item['permissions'] = permissions
+    print(f"chmod: права на '{file_name}' изменены на {permissions}")
+
 def cmd_vfs_save(args):
     if not args:
         print("vfs-save: необходимо указать путь для сохранения")
@@ -289,6 +357,8 @@ def execute_command(args):
         'echo': cmd_echo,
         'clear': cmd_clear,
         'wc': cmd_wc,
+        'touch': cmd_touch,
+        'chmod': cmd_chmod,
         'vfs-save': cmd_vfs_save,
         'exit': cmd_exit
     }

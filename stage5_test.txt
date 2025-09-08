@@ -1,0 +1,42 @@
+echo "=== Тестирование команд touch и chmod ==="
+ls
+echo "Создание файлов с помощью touch:"
+touch new_file.txt
+touch test_document.md
+touch script.sh
+ls
+echo "Попытка создать файл с тем же именем:"
+touch new_file.txt
+echo "Переход в другую директорию и создание файла:"
+cd level1
+touch level1_new_file.txt
+ls
+cd level2
+touch level2_new_file.txt
+ls
+cd ~
+echo "Изменение прав доступа с помощью chmod:"
+chmod 755 new_file.txt
+chmod 644 test_document.md
+chmod 777 script.sh
+echo "Изменение прав для файлов в разных директориях:"
+chmod 600 level1/level1_new_file.txt
+chmod 755 level1/level2/level2_new_file.txt
+echo "Тестирование ошибок chmod:"
+chmod abc new_file.txt
+chmod 12 new_file.txt
+chmod 755 nonexistent_file.txt
+echo "Тестирование touch в несуществующей директории:"
+cd nonexistent_dir
+touch should_fail.txt
+cd ~
+echo "Комбинированный тест:"
+cd docs
+touch readme.txt
+chmod 644 readme.txt
+ls
+chmod 755 help
+echo "Сохранение измененной VFS:"
+vfs-save stage5_modified_vfs.json
+echo "Тестирование завершено"
+exit
