@@ -1,0 +1,14 @@
+echo "Тест команд без VFS"
+ls
+ls -l
+ls /home
+cd Documents
+cd ..
+cd ~
+echo "Hello World"
+echo "Тест echo без VFS"
+clear
+echo "Экран очищен"
+wc test.txt
+echo "Завершение теста без VFS"
+exit

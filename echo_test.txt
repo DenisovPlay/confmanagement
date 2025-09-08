@@ -1,0 +1,14 @@
+echo "Echo без аргументов"
+echo
+echo "Echo с одним аргументом"
+echo hello
+echo "Echo с несколькими аргументами"
+echo hello world test
+echo "Echo с кавычками"
+echo "hello world"
+echo 'single quotes test'
+echo "Комбинированный тест"
+echo test "with quotes" and more
+clear
+echo "Экран был очищен"
+exit

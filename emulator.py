@@ -59,6 +59,9 @@ def list_vfs_directory(path):
         return f"ls: {path}: нет такого файла или каталога"
     
     if item.get('type') != 'directory':
+        if item.get('type') == 'file':
+            size = len(base64.b64decode(item.get('content', ''))) if item.get('content') else 0
+            return f"- {path.split('/')[-1]} ({size} bytes)"
         return f"ls: {path}: не является каталогом"
     
     if 'children' not in item:
@@ -132,6 +135,24 @@ def parse_command(input_line):
     except ValueError as e:
         raise ValueError(f"Ошибка парсинга: {e}")
 
+def get_file_content(path):
+    path_parts = get_vfs_path(path)
+    item = find_vfs_item(path_parts)
+    
+    if not item:
+        return None
+    
+    if item.get('type') != 'file':
+        return None
+    
+    content = item.get('content', '')
+    if content:
+        try:
+            return base64.b64decode(content).decode('utf-8')
+        except:
+            return base64.b64decode(content)
+    return ""
+
 def cmd_ls(args):
     if vfs_data:
         path = args[0] if args else current_dir
@@ -162,6 +183,44 @@ def cmd_cd(args):
                     current_dir = args[0]
                 else:
                     current_dir = f"{current_dir}/{args[0]}"
+
+def cmd_echo(args):
+    print(' '.join(args))
+
+def cmd_clear(args):
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+def cmd_wc(args):
+    if not args:
+        print("wc: отсутствует аргумент файла")
+        return
+    
+    if not vfs_data:
+        print(f"wc: файл '{args[0]}' не найден (VFS не загружена)")
+        return
+    
+    file_path = args[0]
+    if current_dir != "~":
+        file_path = f"{current_dir}/{args[0]}"
+    
+    content = get_file_content(file_path)
+    
+    if content is None:
+        print(f"wc: {args[0]}: нет такого файла или каталога")
+        return
+    
+    if isinstance(content, bytes):
+        try:
+            content = content.decode('utf-8')
+        except:
+            print(f"wc: {args[0]}: не удается прочитать как текст")
+            return
+    
+    lines = content.count('\n') + (1 if content and not content.endswith('\n') else 0)
+    words = len(content.split())
+    chars = len(content)
+    
+    print(f"  {lines}  {words} {chars} {args[0]}")
 
 def cmd_vfs_save(args):
     if not args:
@@ -227,6 +286,9 @@ def execute_command(args):
     commands = {
         'ls': cmd_ls,
         'cd': cmd_cd,
+        'echo': cmd_echo,
+        'clear': cmd_clear,
+        'wc': cmd_wc,
         'vfs-save': cmd_vfs_save,
         'exit': cmd_exit
     }

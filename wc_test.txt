@@ -1,0 +1,19 @@
+wc root_file.txt
+cd level1
+wc level1_file.txt
+cd level2
+wc level2_file.txt
+cd level3
+wc deep_file.txt
+wc binary_data.bin
+cd ../../sibling_dir
+wc sibling_file.txt
+cd ../../docs
+wc manual.txt
+cd help
+wc faq.txt
+cd ~
+echo "Тест ошибок wc:"
+wc nonexistent.txt
+wc level1
+exit

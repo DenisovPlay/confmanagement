@@ -1,0 +1,39 @@
+ls
+echo "Тестирование команд эмулятора"
+echo Привет мир
+echo "Текст с пробелами"
+echo без кавычек несколько слов
+clear
+echo "Экран очищен"
+cd level1
+ls
+cd level2
+ls
+cd level3
+ls
+wc deep_file.txt
+wc binary_data.bin
+cd ~
+cd docs
+ls
+cd help
+ls
+wc faq.txt
+cd ~
+echo "Тест ошибок:"
+cd nonexistent
+ls nonexistent
+wc nonexistent.txt
+echo "Навигация:"
+cd level1
+cd ..
+cd level1/level2
+cd ../sibling_dir
+ls
+cd ../../docs/help
+ls
+cd ~
+echo "Сохранение VFS:"
+vfs-save stage4_test_save.json
+echo "Тестирование завершено"
+exit
