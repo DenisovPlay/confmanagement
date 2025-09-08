@@ -1,0 +1,5 @@
+ls
+cd valid_dir
+invalid_command
+ls
+exit

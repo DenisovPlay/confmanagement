@@ -1,0 +1,13 @@
+ls
+ls -l
+ls -la
+ls /home
+ls "с пробелами в названии"
+
+cd /home
+cd ..
+cd ~
+cd Documents
+cd "folder with spaces"
+
+exit

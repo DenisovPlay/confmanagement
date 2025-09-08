@@ -2,10 +2,13 @@ import getpass
 import socket
 import shlex
 import sys
+import argparse
+import os
 
 username = getpass.getuser()
 hostname = socket.gethostname()
 current_dir = "~"
+vfs_path = None
 
 def get_prompt():
     return f"{username}@{hostname}:{current_dir}$ "
@@ -42,6 +45,52 @@ def cmd_exit(args):
     print("exit")
     sys.exit(0)
 
+def execute_startup_script(script_path):
+    if not os.path.exists(script_path):
+        print(f"Ошибка: стартовый скрипт не найден: {script_path}")
+        return False
+    
+    try:
+        with open(script_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except Exception as e:
+        print(f"Ошибка чтения скрипта: {e}")
+        return False
+    
+    for line_num, line in enumerate(lines, 1):
+        command = line.strip()
+        if not command or command.startswith('#'):
+            continue
+        
+        print(get_prompt() + command)
+        
+        try:
+            args = parse_command(command)
+            execute_command(args)
+        except ValueError as e:
+            print(f"Ошибка в строке {line_num}: {e}")
+            return False
+        except Exception as e:
+            print(f"Ошибка выполнения команды в строке {line_num}: {e}")
+            return False
+    
+    return True
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Эмулятор командной оболочки UNIX')
+    parser.add_argument('--vfs', type=str, help='Путь к виртуальной файловой системе')
+    parser.add_argument('--script', type=str, help='Путь к стартовому скрипту')
+    return parser.parse_args()
+
+def print_config(args):
+    print("=== Конфигурация эмулятора ===")
+    print(f"Пользователь: {username}")
+    print(f"Хост: {hostname}")
+    print(f"Текущая директория: {current_dir}")
+    print(f"VFS путь: {args.vfs if args.vfs else 'не указан'}")
+    print(f"Стартовый скрипт: {args.script if args.script else 'не указан'}")
+    print("=" * 30)
+
 def execute_command(args):
     if not args:
         return
@@ -61,6 +110,20 @@ def execute_command(args):
         print(f"bash: {command}: команда не найдена")
 
 def main():
+    args = parse_args()
+    global vfs_path
+    vfs_path = args.vfs
+    
+    print_config(args)
+    
+    if args.script:
+        print(f"\nВыполнение стартового скрипта: {args.script}")
+        if execute_startup_script(args.script):
+            print("Стартовый скрипт выполнен успешно\n")
+        else:
+            print("Ошибка выполнения стартового скрипта")
+            sys.exit(1)
+    
     try:
         while True:
             try:
